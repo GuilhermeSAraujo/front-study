@@ -7,8 +7,8 @@ import React, { useCallback, useEffect, useState } from "react";
 const animationDuration = 1500;
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [userQuota, setUserQuota] = useState<{ id: string } | undefined>();
   const { data: session, update } = useSession();
+  const [userQuota, setUserQuota] = useState<{ id: string } | undefined>();
   const [initialAnimation, setInitialAnimation] = useState(true);
   const [sessionRefreshed, setSessionRefreshed] = useState(false);
 

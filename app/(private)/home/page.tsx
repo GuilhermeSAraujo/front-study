@@ -1,7 +1,11 @@
-export default function Home() {
+import { auth } from "@/lib/auth";
+
+export default async function Home() {
+  const session = await auth();
+
   return (
     <div>
-      <h1>Home Página!</h1>
+      <h1>Olá! {session?.user.name}</h1>
     </div>
   );
 }
