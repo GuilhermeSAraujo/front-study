@@ -42,7 +42,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
             <Button
               variant="outline"
               type="button"
-              className="w-full"
+              className="w-full cursor-pointer"
               size="lg"
               // asChild
               onClick={handleGoogleSignIn}

@@ -27,7 +27,7 @@ export default function Home() {
               <Link href="#features">Funcionalidades</Link>
             </Button>
             <Button variant="default" asChild>
-              <Link href="#cta">Começar Agora</Link>
+              <Link href="/login">Começar Agora</Link>
             </Button>
           </div>
         </div>
@@ -54,7 +54,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Button size="lg" className="text-base" asChild>
-                <Link href="#cta">
+                <Link href="/login">
                   Começar Gratuitamente
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
@@ -177,7 +177,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Button size="lg" className="text-base" asChild>
-                <Link href="#">
+                <Link href="/login">
                   Criar Conta Gratuita
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
