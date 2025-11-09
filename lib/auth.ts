@@ -24,6 +24,26 @@ declare module "next-auth/jwt" {
 }
 
 export const authOptions: AuthOptions = {
+  secret: process.env.JWT_SECRET,
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: false, // Para desenvolvimento local
+      },
+    },
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -56,27 +76,32 @@ export const authOptions: AuthOptions = {
 
       return true;
     },
-    async jwt({ token, user }) {
-      // Se é o primeiro login, adiciona o id do usuário ao token
+    jwt({ token, user }) {
+      // Quando o usuário faz login, adiciona os dados ao token
       if (user) {
         token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.picture = user.image;
       }
+
+      console.log("token from jwt func", token);
       return token;
     },
-    async session({ session, token }) {
-      if (token.id) {
-        session.user.id = token.id;
+    session({ session, token, trigger: _ }) {
+      /* Step 2: update the session.user based on the token object */
+      if (token && session.user) {
+        if (token.exp) {
+          session.user.id = token.id;
+        } else {
+          // Remove email from session if token is expired
+          // This will log the user out on the client (UserSessionRefresher)
+          session.user.email = "";
+        }
       }
+      session.cc = token.cc;
       return session;
     },
-  },
-  pages: {
-    signIn: "/login",
-    error: "/login",
-  },
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   debug: process.env.NODE_ENV === "development",
 };
