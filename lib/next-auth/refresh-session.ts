@@ -13,10 +13,10 @@ export function refreshSession(sessionState: { update: UpdateSession }) {
       const updatedSession = await sessionState.update({
         [SessionUpdateAction.REFRESH]: true,
       });
-      if (!updatedSession?.user.email) {
-        await signOut({ callbackUrl: "/" });
-        return false;
-      }
+      // if (!updatedSession?.user.email) {
+      //   await signOut({ callbackUrl: "/" });
+      //   return false;
+      // }
       //   else {
       //     Sentry.setUser({
       //       ...updatedSession.user,

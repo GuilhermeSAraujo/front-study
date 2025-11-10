@@ -24,7 +24,7 @@ declare module "next-auth/jwt" {
 }
 
 export const authOptions: AuthOptions = {
-  secret: process.env.JWT_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",
     error: "/login",
@@ -38,9 +38,9 @@ export const authOptions: AuthOptions = {
       name: `next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: "lax",
+        sameSite: "lax", // "lax" para desenvolvimento local, "none" para produção cross-origin
         path: "/",
-        secure: false, // Para desenvolvimento local
+        secure: process.env.NODE_ENV === "production", // true em produção, false em desenvolvimento
       },
     },
   },
@@ -52,54 +52,44 @@ export const authOptions: AuthOptions = {
   ],
   callbacks: {
     async signIn({ user }) {
-      // const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     Authorization: `Bearer ${process.env.API_SECRET}`,
-      //   },
-      //   body: JSON.stringify({
-      //     googleId: user.id,
-      //     name: user.name,
-      //     email: user.email,
-      //     profilePicture: user.image,
-      //   }),
-      // });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/google`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.API_SECRET}`,
+        },
+        body: JSON.stringify({
+          googleId: user.id,
+          name: user.name,
+          email: user.email,
+          profilePicture: user.image,
+        }),
+      });
 
-      // if (!res.ok) {
-      //   throw new Error("Failed to sign in with Google");
-      // }
+      if (!res.ok) {
+        throw new Error("Failed to sign in with Google");
+      }
 
-      // const userData = await res.json();
+      const userData = await res.json();
 
-      user.id = "1337";
+      user.id = userData.id;
 
       return true;
     },
-    jwt({ token, user }) {
-      // Quando o usuário faz login, adiciona os dados ao token
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.name = user.name;
-        token.picture = user.image;
       }
-
-      console.log("token from jwt func", token);
       return token;
     },
-    session({ session, token, trigger: _ }) {
-      /* Step 2: update the session.user based on the token object */
-      if (token && session.user) {
-        if (token.exp) {
-          session.user.id = token.id;
-        } else {
-          // Remove email from session if token is expired
-          // This will log the user out on the client (UserSessionRefresher)
-          session.user.email = "";
-        }
+    async session({ session, token }) {
+      if (token.id) {
+        session.user.id = token.id;
       }
-      session.cc = token.cc;
+      if (token.email) {
+        session.user.email = token.email;
+      }
       return session;
     },
   },
