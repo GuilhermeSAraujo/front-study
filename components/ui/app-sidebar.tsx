@@ -47,7 +47,7 @@ const data = {
     },
     {
       title: "Quizzes",
-      url: "#",
+      url: "/quiz",
       icon: IconListDetails,
     },
     {
