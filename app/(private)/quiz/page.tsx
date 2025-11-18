@@ -22,7 +22,7 @@ import {
 import { useQuizList } from "@/hooks/quiz/list";
 import { Quiz } from "@/lib/types/quiz";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn, getScoreColor } from "@/lib/utils";
 
 function getDifficultyColor(difficulty: Quiz["difficulty"]) {
   switch (difficulty) {
@@ -47,16 +47,6 @@ function getDifficultyLabel(difficulty: Quiz["difficulty"]) {
       return "Difícil";
     default:
       return difficulty;
-  }
-}
-
-function getScoreColor(percentage: number) {
-  if (percentage >= 70) {
-    return "text-green-700 dark:text-green-400";
-  } else if (percentage >= 50) {
-    return "text-yellow-700 dark:text-yellow-400";
-  } else {
-    return "text-red-700 dark:text-red-400";
   }
 }
 

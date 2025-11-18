@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useSession } from "next-auth/react";
 import { useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   IconSchool,
@@ -67,6 +68,7 @@ type QuizFormData = z.infer<typeof quizFormSchema>;
 
 export default function NewQuiz() {
   const session = useSession();
+  const router = useRouter();
   const { data: courses = [], isLoading: isLoadingCourses } = useApi<Course[]>("/course");
 
   const {
@@ -107,8 +109,7 @@ export default function NewQuiz() {
       description: response.message || "Seu quiz está sendo gerado. Aguarde um momento...",
     });
 
-    // TODO: Redirecionar para a página do quiz ou mostrar loading
-    // Exemplo: router.push(`/quiz/${response.id}`);
+    router.push(`/quiz`);
   };
 
   return (

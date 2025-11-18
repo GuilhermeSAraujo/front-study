@@ -63,3 +63,13 @@ function isExpectedError(
       error instanceof e.instance && (!e.message || (!!error && error.message.includes(e.message)))
   );
 }
+
+export function getScoreColor(percentage: number) {
+  if (percentage >= 70) {
+    return "text-green-700 dark:text-green-400";
+  } else if (percentage >= 50) {
+    return "text-yellow-700 dark:text-yellow-400";
+  } else {
+    return "text-red-700 dark:text-red-400";
+  }
+}

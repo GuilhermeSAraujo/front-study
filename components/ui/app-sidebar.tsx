@@ -32,6 +32,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 const data = {
   user: {
@@ -40,31 +41,31 @@ const data = {
     avatar: "/avatars/shadcn.jpg",
   },
   navMain: [
-    {
-      title: "Dashboard",
-      url: "#",
-      icon: IconDashboard,
-    },
+    // {
+    //   title: "Dashboard",
+    //   url: "#",
+    //   icon: IconDashboard,
+    // },
     {
       title: "Quizzes",
       url: "/quiz",
       icon: IconListDetails,
     },
-    {
-      title: "Estatísticas",
-      url: "#",
-      icon: IconChartBar,
-    },
-    {
-      title: "Resumos",
-      url: "#",
-      icon: IconFolder,
-    },
-    {
-      title: "Cursos",
-      url: "#",
-      icon: IconUsers,
-    },
+    // {
+    //   title: "Estatísticas",
+    //   url: "#",
+    //   icon: IconChartBar,
+    // },
+    // {
+    //   title: "Resumos",
+    //   url: "#",
+    //   icon: IconFolder,
+    // },
+    // {
+    //   title: "Cursos",
+    //   url: "#",
+    //   icon: IconUsers,
+    // },
   ],
   navClouds: [
     {
@@ -157,22 +158,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
-              <a href="#">
+              <Link href="/home">
                 <IconInnerShadowTop className="!size-5" />
-                <span className="text-base font-semibold">Study App</span>
-              </a>
+                <span className="text-base font-semibold">Estuda Ai</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        {/* <NavDocuments items={data.documents} />
+        <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>
-      <SidebarFooter>
+      {/* <SidebarFooter>
         <NavUser user={data.user} />
-      </SidebarFooter>
+      </SidebarFooter> */}
     </Sidebar>
   );
 }

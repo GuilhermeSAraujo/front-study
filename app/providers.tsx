@@ -4,6 +4,7 @@ import { fetchApi } from "@/lib/api-client";
 import { refreshSession } from "@/lib/next-auth/refresh-session";
 import { signOut, useSession } from "next-auth/react";
 import React, { useCallback, useEffect, useState } from "react";
+import { Toaster } from "sonner";
 
 const animationDuration = 1500;
 
@@ -43,6 +44,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      <Toaster />
       {/* context de quota */}
       {children}
     </>
