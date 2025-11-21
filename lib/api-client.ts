@@ -2,24 +2,37 @@
 
 import useSWR, { type SWRConfiguration, type SWRResponse } from "swr";
 import { toast } from "sonner";
+import { useSession } from "next-auth/react";
+import type { Session } from "next-auth";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+// Extend Session type to include token
+interface ExtendedSession extends Session {
+  token?: string;
+}
 
 export async function fetchApi<T = unknown>(
   path: string,
   options: RequestInit = {},
-  showErrorToast = true
+  showErrorToast = true,
+  token?: string
 ): Promise<T> {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(options.headers as Record<string, string>),
   };
 
+  // Add Authorization header if token is provided
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
   try {
     const response = await fetch(`${API_URL}${path}`, {
       ...options,
       headers,
-      credentials: "include", // Envia cookies automaticamente
+      credentials: "include", // Keep for backward compatibility with local dev
     });
 
     const contentType = response.headers.get("content-type");
@@ -67,8 +80,36 @@ export async function fetchApi<T = unknown>(
 }
 
 /**
+ * Hook to get authenticated fetchApi function with session token
+ * Use this when you need to call fetchApi directly with automatic token injection
+ *
+ * @example
+ * ```ts
+ * function MyComponent() {
+ *   const fetchWithAuth = useAuthenticatedFetch();
+ *
+ *   const handleSubmit = async () => {
+ *     const result = await fetchWithAuth("/quiz", { method: "POST", body: JSON.stringify(data) });
+ *   };
+ * }
+ * ```
+ */
+export function useAuthenticatedFetch() {
+  const { data: session } = useSession();
+  const token = (session as ExtendedSession)?.token;
+
+  return <T = unknown>(
+    path: string,
+    options: RequestInit = {},
+    showErrorToast = true
+  ): Promise<T> => {
+    return fetchApi<T>(path, options, showErrorToast, token);
+  };
+}
+
+/**
  * Hook para fazer requisições HTTP com SWR
- * Envia cookies automaticamente e trata erros com toast
+ * Envia o token JWT no header Authorization e trata erros com toast
  *
  * @example
  * ```ts
@@ -86,8 +127,11 @@ export function useApi<T = unknown>(
   options?: RequestInit,
   swrConfig?: SWRConfiguration<T>
 ): SWRResponse<T, Error> {
+  const { data: session } = useSession();
+  const token = (session as ExtendedSession)?.token;
+
   const fetcher = async (url: string): Promise<T> => {
-    return fetchApi<T>(url, options, true);
+    return fetchApi<T>(url, options, true, token);
   };
 
   return useSWR<T, Error>(path, fetcher, {

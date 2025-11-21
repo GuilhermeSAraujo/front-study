@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { useQuizDetails } from "@/hooks/quiz/details";
-import { fetchApi } from "@/lib/api-client";
+import { useAuthenticatedFetch } from "@/lib/api-client";
 import { getScoreColor } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -17,6 +17,7 @@ export default function QuizDetailPage() {
   const params = useParams();
   const quizId = params.id as string;
   const { quiz, isLoadingQuiz, error } = useQuizDetails({ id: quizId });
+  const fetchWithAuth = useAuthenticatedFetch();
 
   const [answers, setAnswers] = useState<Record<number, Answer>>({});
   const isInitialized = useRef(false);
@@ -88,7 +89,7 @@ export default function QuizDetailPage() {
     const totalQuestions = quiz.questions.length;
     const score = Math.round((correctAnswers / totalQuestions) * 100);
 
-    await fetchApi(`/quiz/${quiz.id}`, {
+    await fetchWithAuth(`/quiz/${quiz.id}`, {
       method: "POST",
       body: JSON.stringify({ answers }),
     });

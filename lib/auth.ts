@@ -1,8 +1,9 @@
 import { AuthOptions } from "next-auth";
 import { getServerSession } from "next-auth/next";
 import GoogleProvider from "next-auth/providers/google";
+import { encode } from "next-auth/jwt";
 
-// Estende o tipo User do NextAuth para incluir o id
+// Estende o tipo User do NextAuth para incluir o id e token
 declare module "next-auth" {
   interface Session {
     user: {
@@ -11,6 +12,7 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
     };
+    token?: string; // JWT token para enviar no Authorization header
   }
 }
 
@@ -38,9 +40,9 @@ export const authOptions: AuthOptions = {
       name: `next-auth.session-token`,
       options: {
         httpOnly: true,
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", // "none" para produção cross-origin, "lax" para desenvolvimento
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         path: "/",
-        secure: process.env.NODE_ENV === "production", // true em produção, false em desenvolvimento
+        secure: process.env.NODE_ENV === "production",
       },
     },
   },
@@ -90,6 +92,16 @@ export const authOptions: AuthOptions = {
       if (token.email) {
         session.user.email = token.email;
       }
+
+      // Encode the JWT token to send in Authorization header
+      if (process.env.NEXTAUTH_SECRET) {
+        const encodedToken = await encode({
+          token,
+          secret: process.env.NEXTAUTH_SECRET,
+        });
+        session.token = encodedToken;
+      }
+
       return session;
     },
   },

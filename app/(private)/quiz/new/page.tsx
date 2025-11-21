@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useApi, fetchApi } from "@/lib/api-client";
+import { useApi, useAuthenticatedFetch } from "@/lib/api-client";
 import type { Course } from "@/lib/types/course";
 
 const difficultyOptions = [
@@ -70,6 +70,7 @@ export default function NewQuiz() {
   const session = useSession();
   const router = useRouter();
   const { data: courses = [], isLoading: isLoadingCourses } = useApi<Course[]>("/course");
+  const fetchWithAuth = useAuthenticatedFetch();
 
   const {
     register,
@@ -100,7 +101,7 @@ export default function NewQuiz() {
   };
 
   const onSubmit = async (data: QuizFormData) => {
-    const response = await fetchApi<{ id: string; status: string; message: string }>("/quiz", {
+    const response = await fetchWithAuth<{ id: string; status: string; message: string }>("/quiz", {
       method: "POST",
       body: JSON.stringify(data),
     });
