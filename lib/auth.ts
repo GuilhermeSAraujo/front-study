@@ -21,6 +21,7 @@ export const auth = betterAuth({
           await db.insert(schema.userQuota).values({
             userId: user.id,
             id: crypto.randomUUID(),
+            purchased: 10,
           });
         },
       },
