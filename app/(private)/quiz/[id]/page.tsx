@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { useQuizDetails } from "@/hooks/quiz/details";
-import { useAuthenticatedFetch } from "@/lib/api-client";
+import { fetchApi } from "@/lib/api-client";
+import { useSession } from "@/lib/auth-client";
 import { getScoreColor } from "@/lib/utils";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -17,7 +18,7 @@ export default function QuizDetailPage() {
   const params = useParams();
   const quizId = params.id as string;
   const { quiz, isLoadingQuiz, error } = useQuizDetails({ id: quizId });
-  const fetchWithAuth = useAuthenticatedFetch();
+  const { data: session } = useSession();
 
   const [answers, setAnswers] = useState<Record<number, Answer>>({});
   const isInitialized = useRef(false);
@@ -89,10 +90,15 @@ export default function QuizDetailPage() {
     const totalQuestions = quiz.questions.length;
     const score = Math.round((correctAnswers / totalQuestions) * 100);
 
-    await fetchWithAuth(`/quiz/${quiz.id}`, {
-      method: "POST",
-      body: JSON.stringify({ answers }),
-    });
+    await fetchApi(
+      `/quiz/${quiz.id}`,
+      {
+        method: "POST",
+        body: JSON.stringify({ answers }),
+      },
+      true,
+      session?.session.token
+    );
 
     toast.success("Quiz enviado com sucesso!", {
       description: `Você acertou ${correctAnswers} de ${totalQuestions} questões (${score}%)`,

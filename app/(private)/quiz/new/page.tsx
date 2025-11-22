@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { useSession } from "next-auth/react";
+import { useSession } from "@/lib/auth-client";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useApi, useAuthenticatedFetch } from "@/lib/api-client";
+import { useApi, fetchApi } from "@/lib/api-client";
 import type { Course } from "@/lib/types/course";
 
 const difficultyOptions = [
@@ -67,10 +67,9 @@ const quizFormSchema = z.object({
 type QuizFormData = z.infer<typeof quizFormSchema>;
 
 export default function NewQuiz() {
-  const session = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
   const { data: courses = [], isLoading: isLoadingCourses } = useApi<Course[]>("/course");
-  const fetchWithAuth = useAuthenticatedFetch();
 
   const {
     register,
@@ -101,10 +100,15 @@ export default function NewQuiz() {
   };
 
   const onSubmit = async (data: QuizFormData) => {
-    const response = await fetchWithAuth<{ id: string; status: string; message: string }>("/quiz", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    const response = await fetchApi<{ id: string; status: string; message: string }>(
+      "/quiz",
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
+      true,
+      session?.session.token
+    );
 
     toast.success("Quiz criado com sucesso!", {
       description: response.message || "Seu quiz está sendo gerado. Aguarde um momento...",
@@ -116,9 +120,7 @@ export default function NewQuiz() {
   return (
     <div className="flex flex-col gap-6 px-4 py-6 md:px-6">
       <div>
-        <Text type="h3">
-          O que deseja estudar hoje, {session.data?.user.name?.split(" ")?.[0]}?
-        </Text>
+        <Text type="h3">O que deseja estudar hoje, {session?.user.name?.split(" ")?.[0]}?</Text>
         <p className="mt-2 text-sm text-muted-foreground">
           Preencha os campos abaixo para criar um quiz personalizado
         </p>

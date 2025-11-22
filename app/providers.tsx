@@ -1,28 +1,21 @@
 "use client";
 
-import { fetchApi } from "@/lib/api-client";
-import { refreshSession } from "@/lib/next-auth/refresh-session";
-import { signOut, useSession } from "next-auth/react";
-import React, { useCallback, useEffect, useState } from "react";
+import { useSession } from "@/lib/auth-client";
+import React, { useCallback, useEffect } from "react";
 import { Toaster } from "sonner";
 
-const animationDuration = 1500;
-
 export function Providers({ children }: { children: React.ReactNode }) {
-  const { data: session, update } = useSession();
-  const [userQuota, setUserQuota] = useState<{ id: string } | undefined>();
-  const [initialAnimation, setInitialAnimation] = useState(true);
-  const [sessionRefreshed, setSessionRefreshed] = useState(false);
+  const { data: session } = useSession();
 
   const userQuotaFetch = useCallback(() => {
     // fetchApi("/user/quota", {})
     //   .then((data) => {
-    //     setUserQuota(data);
+    //     // setUserQuota(data);
     //   })
     //   .catch(async (err) => {
     //     console.error(err);
     //     window.localStorage.clear();
-    //     await signOut({ callbackUrl: "/" });
+    //     // await signOut({ callbackUrl: "/" });
     //   });
   }, []);
 
@@ -32,15 +25,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
       userQuotaFetch();
     }
   }, [session?.user.id, userQuotaFetch]);
-
-  useEffect(() => {
-    void refreshSession({ update }).then((ok) => {
-      setSessionRefreshed(ok);
-    });
-    setTimeout(() => {
-      setInitialAnimation(false);
-    }, animationDuration);
-  }, []);
 
   return (
     <>

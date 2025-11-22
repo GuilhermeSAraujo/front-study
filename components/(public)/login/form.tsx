@@ -3,9 +3,9 @@
 import { GoogleIcon } from "@/components/(public)/login/google-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { signIn } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { BookHeart, Loader2 } from "lucide-react";
-import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -16,7 +16,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
     try {
-      await signIn("google", { callbackUrl: "/home" });
+      await signIn.social({
+        provider: "google",
+        callbackURL: "/home",
+      });
     } catch (error) {
       console.error("Error signing in with Google:", error);
       toast.error("Erro ao fazer login com Google. Por favor, tente novamente.");
