@@ -6,11 +6,13 @@ export function useQuizDetails({ id }: { id: string }) {
     data: quiz,
     isLoading: isLoadingQuiz,
     error,
+    mutate: mutateQuizDetails,
   } = useApi<QuizWithResult>(id ? `/quiz/${id}` : null);
 
   return {
     quiz,
     isLoadingQuiz,
     error,
+    mutateQuizDetails,
   };
 }

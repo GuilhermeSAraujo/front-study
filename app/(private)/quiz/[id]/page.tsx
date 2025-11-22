@@ -17,7 +17,7 @@ type Answer = "A" | "B" | "C" | "D";
 export default function QuizDetailPage() {
   const params = useParams();
   const quizId = params.id as string;
-  const { quiz, isLoadingQuiz, error } = useQuizDetails({ id: quizId });
+  const { quiz, isLoadingQuiz, error, mutateQuizDetails } = useQuizDetails({ id: quizId });
   const { data: session } = useSession();
 
   const [answers, setAnswers] = useState<Record<number, Answer>>({});
@@ -103,6 +103,8 @@ export default function QuizDetailPage() {
     toast.success("Quiz enviado com sucesso!", {
       description: `Você acertou ${correctAnswers} de ${totalQuestions} questões (${score}%)`,
     });
+
+    mutateQuizDetails();
 
     setIsSubmitting(false);
   };
