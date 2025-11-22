@@ -92,14 +92,14 @@ export function useApi<T = unknown>(
   options?: RequestInit,
   swrConfig?: SWRConfiguration<T>
 ): SWRResponse<T, Error> {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
   const token = session?.session.token;
 
   const fetcher = async (url: string): Promise<T> => {
     return fetchApi<T>(url, options, true, token);
   };
 
-  return useSWR<T, Error>(path, fetcher, {
+  return useSWR<T, Error>(isPending ? null : path, fetcher, {
     ...swrConfig,
     onError: (error, key, config) => {
       // O toast já é exibido no fetchApi, mas podemos adicionar lógica adicional aqui se necessário
