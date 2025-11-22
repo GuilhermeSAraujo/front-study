@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { MoreVertical, Edit, Trash2, Copy, Eye } from "lucide-react";
+import { MoreVertical, Edit, Trash2, Copy, Eye, Hammer, RefreshCw } from "lucide-react";
 import { Text } from "@/components/ui/text";
 import {
   Card,
@@ -52,7 +52,7 @@ function getDifficultyLabel(difficulty: Quiz["difficulty"]) {
 
 export default function QuizList() {
   const router = useRouter();
-  const { quizzes, isLoadingQuizzes } = useQuizList();
+  const { quizzes, isLoadingQuizzes, mutateQuizList } = useQuizList();
 
   const handleQuizClick = (quizId: string) => {
     router.push(`/quiz/${quizId}`);
@@ -94,102 +94,135 @@ export default function QuizList() {
 
   return (
     <div className="flex flex-col gap-6 px-4 py-6 md:px-6">
-      <div>
-        <Text type="h3">Esses são seus quizes:</Text>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Listagem com seus quizes criados, clique para ver detalhes
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <Text type="h3">Esses são seus quizes:</Text>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Listagem com seus quizes criados, clique para ver detalhes
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          className="cursor-pointer"
+          size="icon"
+          onClick={() => mutateQuizList()}
+        >
+          <RefreshCw className="h-4 w-4" />
+          <span className="sr-only">Atualizar lista</span>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {quizzes.map((quiz) => (
-          <Card
-            key={quiz.id}
-            className="cursor-pointer transition-all hover:shadow-md"
-            onClick={() => handleQuizClick(quiz.id)}
-          >
-            <CardHeader>
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 min-w-0">
-                  <CardTitle className="line-clamp-2">{quiz.topicName}</CardTitle>
-                  <CardDescription className="mt-1 line-clamp-1">{quiz.courseName}</CardDescription>
+        {quizzes.map((quiz) => {
+          const isInCreation = !!quiz.status;
+
+          return (
+            <Card
+              key={quiz.id}
+              className={cn(
+                "transition-all hover:shadow-md",
+                isInCreation ? "cursor-default bg-muted/40" : "cursor-pointer"
+              )}
+              onClick={() => !isInCreation && handleQuizClick(quiz.id)}
+            >
+              <CardHeader>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="line-clamp-2">{quiz.topicName}</CardTitle>
+                    <CardDescription className="mt-1 line-clamp-1">
+                      {quiz.courseName}
+                    </CardDescription>
+                    {isInCreation && (
+                      <div className="mt-2 flex items-center gap-2 text-amber-600 dark:text-amber-500">
+                        <Hammer className="h-4 w-4" />
+                        <span className="text-xs font-medium">{quiz.status}</span>
+                      </div>
+                    )}
+                  </div>
+                  <CardAction>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-8 w-8"
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                          <span className="sr-only">Ações do quiz</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={(e) => handleActionClick(e, "view", quiz.id)}>
+                          <Eye className="h-4 w-4" />
+                          Visualizar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={(e) => handleActionClick(e, "edit", quiz.id)}>
+                          <Edit className="h-4 w-4" />
+                          Editar
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={(e) => handleActionClick(e, "duplicate", quiz.id)}
+                        >
+                          <Copy className="h-4 w-4" />
+                          Duplicar
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          variant="destructive"
+                          onClick={(e) => handleActionClick(e, "delete", quiz.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Excluir
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </CardAction>
                 </div>
-                <CardAction>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={(e) => e.stopPropagation()}
-                        className="h-8 w-8"
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                        <span className="sr-only">Ações do quiz</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={(e) => handleActionClick(e, "view", quiz.id)}>
-                        <Eye className="h-4 w-4" />
-                        Visualizar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e) => handleActionClick(e, "edit", quiz.id)}>
-                        <Edit className="h-4 w-4" />
-                        Editar
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e) => handleActionClick(e, "duplicate", quiz.id)}>
-                        <Copy className="h-4 w-4" />
-                        Duplicar
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        variant="destructive"
-                        onClick={(e) => handleActionClick(e, "delete", quiz.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Excluir
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </CardAction>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className={cn(getDifficultyColor(quiz.difficulty))}>
-                    {getDifficultyLabel(quiz.difficulty)}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {quiz.questions.length} {quiz.questions.length === 1 ? "pergunta" : "perguntas"}
-                  </span>
-                </div>
-                {quiz.totalQuestions !== null && quiz.correctAnswers !== null && (
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">
-                      {quiz.correctAnswers}/{quiz.totalQuestions} acertos
-                    </span>
-                    <span
-                      className={cn(
-                        "text-xs font-medium",
-                        getScoreColor(Math.round((quiz.correctAnswers / quiz.totalQuestions) * 100))
-                      )}
-                    >
-                      ({Math.round((quiz.correctAnswers / quiz.totalQuestions) * 100)}%)
+                    <Badge variant="outline" className={cn(getDifficultyColor(quiz.difficulty))}>
+                      {getDifficultyLabel(quiz.difficulty)}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {quiz.questions.length}{" "}
+                      {quiz.questions.length === 1 ? "pergunta" : "perguntas"}
                     </span>
                   </div>
-                )}
-                {quiz.additionalInfo && (
-                  <p className="line-clamp-2 text-sm text-muted-foreground">
-                    {quiz.additionalInfo}
-                  </p>
-                )}
-                <div className="text-xs text-muted-foreground">
-                  Criado em {new Date(quiz.createdAt).toLocaleDateString("pt-BR")}
+                  {!isInCreation &&
+                    quiz.totalQuestions !== null &&
+                    quiz.correctAnswers !== null && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">
+                          {quiz.correctAnswers}/{quiz.totalQuestions} acertos
+                        </span>
+                        <span
+                          className={cn(
+                            "text-xs font-medium",
+                            getScoreColor(
+                              Math.round((quiz.correctAnswers / quiz.totalQuestions) * 100)
+                            )
+                          )}
+                        >
+                          ({Math.round((quiz.correctAnswers / quiz.totalQuestions) * 100)}%)
+                        </span>
+                      </div>
+                    )}
+                  {quiz.additionalInfo && (
+                    <p className="line-clamp-2 text-sm text-muted-foreground">
+                      {quiz.additionalInfo}
+                    </p>
+                  )}
+                  <div className="text-xs text-muted-foreground">
+                    Criado em {new Date(quiz.createdAt).toLocaleDateString("pt-BR")}
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

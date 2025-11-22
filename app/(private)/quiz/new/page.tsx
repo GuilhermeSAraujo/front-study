@@ -100,7 +100,7 @@ export default function NewQuiz() {
   };
 
   const onSubmit = async (data: QuizFormData) => {
-    const response = await fetchApi<{ id: string; status: string; message: string }>(
+    await fetchApi<{ id: string; status: string; message: string }>(
       "/quiz",
       {
         method: "POST",
@@ -111,7 +111,8 @@ export default function NewQuiz() {
     );
 
     toast.success("Quiz criado com sucesso!", {
-      description: response.message || "Seu quiz está sendo gerado. Aguarde um momento...",
+      description: "Seu quiz está sendo gerado. Aguarde um momento...",
+      duration: 10000,
     });
 
     router.push(`/quiz`);

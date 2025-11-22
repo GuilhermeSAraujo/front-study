@@ -28,6 +28,7 @@ export interface Quiz {
   deletedAt: Date | null;
   totalQuestions: number | null;
   correctAnswers: number | null;
+  status?: string | null;
 }
 
 export interface QuizResult {
