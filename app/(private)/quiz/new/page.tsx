@@ -1,22 +1,21 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { useSession } from "@/lib/auth-client";
-import { useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  IconSchool,
-  IconList,
   IconChartBar,
-  IconNotes,
-  IconSparkles,
+  IconList,
   IconLoader2,
+  IconNotes,
+  IconSchool,
+  IconSparkles,
 } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
+import { useMemo } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
-import { Text } from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -26,7 +25,6 @@ import {
   FieldError,
   FieldLabel,
 } from "@/components/ui/field";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -34,7 +32,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useApi, fetchApi } from "@/lib/api-client";
+import { Text } from "@/components/ui/text";
+import { Textarea } from "@/components/ui/textarea";
+import { fetchApi, useApi } from "@/lib/api-client";
 import type { Course } from "@/lib/types/course";
 
 const difficultyOptions = [
