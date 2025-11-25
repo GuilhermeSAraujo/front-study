@@ -106,7 +106,6 @@ export default function NewQuiz() {
         method: "POST",
         body: JSON.stringify(data),
       },
-      true,
       session?.session.token
     );
 

@@ -1,25 +1,71 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { RefreshCw } from "lucide-react";
-import { Text } from "@/components/ui/text";
-import { CardSkeleton } from "@/components/ui/card-skeleton";
-import { Button } from "@/components/ui/button";
-import { useQuizList } from "@/hooks/quiz/list";
 import { QuizCard } from "@/components/(private)/quiz/quiz-card";
+import { Button } from "@/components/ui/button";
+import { CardSkeleton } from "@/components/ui/card-skeleton";
+import { Text } from "@/components/ui/text";
+import { useQuizList } from "@/hooks/quiz/list";
+import { fetchApi } from "@/lib/api-client";
+import { useSession } from "@/lib/auth-client";
+import { RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function QuizList() {
   const router = useRouter();
   const { quizzes, isLoadingQuizzes, mutateQuizList } = useQuizList();
+  const { data: session } = useSession();
 
   const handleQuizClick = (quizId: string) => {
     router.push(`/quiz/${quizId}`);
   };
 
-  const handleActionClick = (e: React.MouseEvent, action: string, quizId: string) => {
+  const handleActionClick = async (
+    e: React.MouseEvent,
+    action: "view" | "reset" | "delete",
+    quizId: string
+  ) => {
     e.stopPropagation();
     // Ações serão implementadas posteriormente
     console.log(`Action: ${action}, Quiz ID: ${quizId}`);
+
+    if (action === "view") {
+      router.push(`/quiz/${quizId}`);
+      return;
+    }
+
+    if (action === "reset") {
+      await fetchApi(
+        `/quiz/result/${quizId}`,
+        {
+          method: "DELETE",
+        },
+        session?.session.token
+      );
+      mutateQuizList((c) => {
+        return c?.map((quiz) => {
+          if (quiz.id !== quizId) return quiz;
+          return {
+            ...quiz,
+            correctAnswers: null,
+          };
+        });
+      });
+      return;
+    }
+
+    if (action === "delete") {
+      await fetchApi(
+        `/quiz/${quizId}`,
+        {
+          method: "DELETE",
+        },
+        session?.session.token
+      );
+      mutateQuizList((c) => {
+        return c?.filter((q) => q.id !== quizId);
+      });
+      return;
+    }
   };
 
   // add skeleton

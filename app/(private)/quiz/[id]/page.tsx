@@ -91,12 +91,11 @@ export default function QuizDetailPage() {
     const score = Math.round((correctAnswers / totalQuestions) * 100);
 
     await fetchApi(
-      `/quiz/${quiz.id}`,
+      `/quiz/result/${quiz.id}`,
       {
         method: "POST",
         body: JSON.stringify({ answers }),
       },
-      true,
       session?.session.token
     );
 

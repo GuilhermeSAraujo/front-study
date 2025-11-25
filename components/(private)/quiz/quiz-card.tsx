@@ -1,15 +1,15 @@
 "use client";
 
-import { MoreVertical, Edit, Trash2, Copy, Eye, Hammer } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardAction,
+  CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardAction,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,13 +18,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Quiz } from "@/lib/types/quiz";
-import { Badge } from "@/components/ui/badge";
 import { cn, getScoreColor } from "@/lib/utils";
+import { Eye, Hammer, MessageCircleReply, MoreVertical, Trash2 } from "lucide-react";
 
 interface QuizCardProps {
   quiz: Quiz;
   onClick: (quizId: string) => void;
-  onAction: (e: React.MouseEvent, action: string, quizId: string) => void;
+  onAction: (e: React.MouseEvent, action: "view" | "reset" | "delete", quizId: string) => void;
 }
 
 function getDifficultyColor(difficulty: Quiz["difficulty"]) {
@@ -80,7 +80,7 @@ export function QuizCard({ quiz, onClick, onAction }: QuizCardProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="icon-sm"
                   onClick={(e) => e.stopPropagation()}
                   className="h-8 w-8"
@@ -94,13 +94,9 @@ export function QuizCard({ quiz, onClick, onAction }: QuizCardProps) {
                   <Eye className="h-4 w-4" />
                   Visualizar
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => onAction(e, "edit", quiz.id)}>
-                  <Edit className="h-4 w-4" />
-                  Editar
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={(e) => onAction(e, "duplicate", quiz.id)}>
-                  <Copy className="h-4 w-4" />
-                  Duplicar
+                <DropdownMenuItem onClick={(e) => onAction(e, "reset", quiz.id)}>
+                  <MessageCircleReply className="h-4 w-4" />
+                  Resetar respostas
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem

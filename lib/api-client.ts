@@ -9,7 +9,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 export async function fetchApi<T = unknown>(
   path: string,
   options: RequestInit = {},
-  showErrorToast = true,
   token?: string
 ): Promise<T> {
   const headers: Record<string, string> = {
@@ -42,11 +41,9 @@ export async function fetchApi<T = unknown>(
       const errorMessage =
         errorData?.message || errorData?.error || response.statusText || "Request failed";
 
-      if (showErrorToast) {
-        toast.error("Ops", {
-          description: errorMessage,
-        });
-      }
+      toast.error("Ops", {
+        description: errorMessage,
+      });
 
       throw new Error(errorMessage);
     }
@@ -54,7 +51,7 @@ export async function fetchApi<T = unknown>(
     return data;
   } catch (error) {
     if (error instanceof Error) {
-      if (showErrorToast && error.message !== "Request failed") {
+      if (error.message !== "Request failed") {
         toast.error("Ops", {
           description: error.message,
         });
@@ -63,11 +60,9 @@ export async function fetchApi<T = unknown>(
     }
 
     const errorMessage = "Conexão falhou. Verifique sua conexão com a internet e tente novamente.";
-    if (showErrorToast) {
-      toast.error("Ops", {
-        description: errorMessage,
-      });
-    }
+    toast.error("Ops", {
+      description: errorMessage,
+    });
     throw new Error(errorMessage);
   }
 }
@@ -96,7 +91,7 @@ export function useApi<T = unknown>(
   const token = session?.session.token;
 
   const fetcher = async (url: string): Promise<T> => {
-    return fetchApi<T>(url, options, true, token);
+    return fetchApi<T>(url, options, token);
   };
 
   return useSWR<T, Error>(isPending ? null : path, fetcher, {
